@@ -19,15 +19,65 @@ Replace this paragraph with your own summary of what your version does.
 
 Explain your design in plain language.
 
+Real-world recommenders (like Spotify and YouTube) usually combine many behavior signals and content signals: they score each item for how well it matches a user, then rank the full list to produce the final recommendations. My version is a simplified content-based system that prioritizes my vibe preferences: danceable beats, mellow texture, and songs that feel like they build toward a peak. Instead of treating "higher is always better," it rewards songs that are closest to my preferred feature targets.
+
+### Song Features Used
+
+- `id`
+- `title`
+- `artist`
+- `genre`
+- `mood`
+- `energy`
+- `tempo_bpm`
+- `valence`
+- `danceability`
+- `acousticness`
+
+### UserProfile Features Used
+
+- `preferred_genres` (list of liked genres)
+- `preferred_moods` (list of target moods such as chill/focused/moody)
+- `target_energy` (numeric target, matched by closeness)
+- `target_tempo_bpm` (numeric target, matched by closeness)
+- `target_valence` (numeric target, matched by closeness)
+- `target_danceability` (numeric target, matched by closeness)
+- `target_acousticness` (numeric target for mellow texture)
+- `weight_genre`
+- `weight_mood`
+- `weight_energy`
+- `weight_tempo`
+- `weight_valence`
+- `weight_danceability`
+- `weight_acousticness`
+
 Some prompts to answer:
 
 - What features does each `Song` use in your system
   - For example: genre, mood, energy, tempo
+ I plan to use context of identity like artist, genre, mood, title then I will include energy, temp (BPM), danceability, acousticness, valence
+
+
 - What information does your `UserProfile` store
+I will store preferred genres, moods, target numeric values for energy/temp/valence/danceability/acousticness and then feature weights to emphasize what matters more
+
 - How does your `Recommender` compute a score for each song
+I plan to do it like Spotify scores for songs in their platform partially- 
+Calculating closeness (like distance), like say song gets more score if energy or tempo is closer to my target values
+Could also add categorical match points for mood and genre, combine all with weighted sum
+
 - How do you choose which songs to recommend
+First, optional guardrails filter out obvious mismatches (for example, too far from your danceability/tempo comfort zone). Then all remaining songs are scored with the same rule. Songs are ranked from highest to lowest total score. Top N songs are recommended as your final list (for example top 3 or top 5)
 
 You can include a simple diagram or bullet list if helpful.
+
+User Profile (preferred genres, moods, target feature values, weights)
+-> Compare each song to targets using closeness
+-> Add mood/genre match points
+-> Combine using weighted sum
+-> Rank songs by final score
+-> Return Top N recommendations
+
 
 ---
 
