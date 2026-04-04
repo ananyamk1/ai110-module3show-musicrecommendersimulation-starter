@@ -198,6 +198,10 @@ Write 1 to 2 paragraphs here about what you learned:
 - about how recommenders turn data into predictions
 - about where bias or unfairness could show up in systems like this
 
+My biggest learning was that small scoring choices can strongly change the final recommendations. When I tested multiple user profiles, I saw that the same song could move from rank 1 to rank 3 with only a small weight change. That showed me that recommendation systems are not only about data, they are also about product decisions hidden in the scoring logic. I also learned that even simple feature matching (genre, mood, energy) can feel surprisingly personal when the top results align with user intent.
+
+I also saw how bias can appear quickly in a small system. In my tests, high-energy songs often ranked highly across very different users, which created an energy-centered filter bubble. Songs like "Gym Hero" appeared often because energy and danceability were strong signals, even when mood was not a perfect fit. This made me realize that fairness in recommenders is not just about avoiding harmful content, but also about balancing variety, intent, and representation so the same style does not dominate everyone’s results.
+
 
 ---
 

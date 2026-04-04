@@ -1,106 +1,56 @@
-# 🎧 Model Card: Music Recommender Simulation
+# Model Card: VibeCompass 1.0
 
-## 1. Model Name  
+## Model Name
+VibeCompass 1.0.
+It recommends songs based on vibe and listening goals.
 
-Give your model a short, descriptive name.  
-Example: **VibeFinder 1.0**  
+## Goal / Task
+This recommender suggests songs a user might like.
+It tries to match genre, mood, and music features like energy and tempo.
+It returns the top ranked songs, not one perfect answer.
 
----
+## Data Used
+The dataset has 18 songs.
+Each song includes genre, mood, energy, tempo, valence, danceability, and acousticness.
+The catalog is small, so it cannot represent all music tastes.
+Some genres and moods have only one or two songs.
 
-## 2. Intended Use  
+## Algorithm Summary
+Each song gets points for how well it matches user preferences.
+Genre and mood can add bonus points.
+Feature similarity adds more points when values are close to the user target.
+Right now, energy has strong influence, so energetic songs can rank high often.
+Then the system sorts songs by score and returns the top results.
 
-Describe what your recommender is designed to do and who it is for. 
+## Observed Behavior / Biases
+I saw an energy-centered pattern in many tests.
+Songs with similar energy often beat songs with better emotional fit.
+For example, songs like "Gym Hero" can appear often for "Happy Pop" style users because they are high energy and highly danceable.
+The small dataset also creates repetition, so the same songs show up across different profiles.
 
-Prompts:  
+## Evaluation Process
+I tested everyday profiles like High-Energy Pop, Chill Lofi, and Warm Up Workout.
+I also tested edge-case profiles like Sad Pop Music, High Energy + Sad, and Impossible Preference.
+I compared top 5 outputs across profiles to see what changed and why.
+I also ran a logic experiment by lowering genre weight and increasing energy weight.
+That experiment showed clearer emotional matches in some cases, but weaker genre loyalty in others.
 
-- What kind of recommendations does it generate  
-- What assumptions does it make about the user  
-- Is this for real users or classroom exploration  
+## Intended Use and Non-Intended Use
+Intended use: classroom learning and basic recommender experiments.
+It is good for understanding how weights and features affect ranking.
+Non-intended use: real-world music personalization at scale.
+It should not be used for high-stakes decisions or claims about user identity, mental health, or culture.
 
----
+## Ideas for Improvement
+1. Increase dataset size and balance genres and moods.
+2. Add a small penalty for strong mood mismatch so happy songs do not dominate sad requests.
+3. Add a diversity rule so top 5 results are less repetitive.
 
-## 3. How the Model Works  
+## Personal Reflection
+My biggest learning moment was seeing how one weight change could totally change the top recommendation. I learned that recommender behavior is not just about data, it is also about design choices in scoring.
 
-Explain your scoring approach in simple language.  
+AI tools helped me move faster when generating test profiles, comparing outputs, and writing clear explanations. I still had to double-check AI suggestions by running the code and reading the actual ranking results in the terminal.
 
-Prompts:  
+I was surprised that a simple point-based algorithm could still feel like a real recommendation system. Even basic rules made results that felt intuitive most of the time, which is both useful and a little risky when hidden biases are present.
 
-- What features of each song are used (genre, energy, mood, etc.)  
-- What user preferences are considered  
-- How does the model turn those into a score  
-- What changes did you make from the starter logic  
-
-Avoid code here. Pretend you are explaining the idea to a friend who does not program.
-
----
-
-## 4. Data  
-
-Describe the dataset the model uses.  
-
-Prompts:  
-
-- How many songs are in the catalog  
-- What genres or moods are represented  
-- Did you add or remove data  
-- Are there parts of musical taste missing in the dataset  
-
----
-
-## 5. Strengths  
-
-Where does your system seem to work well  
-
-Prompts:  
-
-- User types for which it gives reasonable results  
-- Any patterns you think your scoring captures correctly  
-- Cases where the recommendations matched your intuition  
-
----
-
-## 6. Limitations and Bias 
-
-Where the system struggles or behaves unfairly. 
-
-One weakness I observed is an energy-driven filter bubble: because energy alignment is weighted strongly, songs with similar energy repeatedly rise to the top even when mood or genre intent is less aligned. This can bias recommendations toward users whose preferences are near the dataset's mid-to-high energy range, while users asking for low-energy but emotionally specific music may get less precise results. The default guardrails are broad enough to let many candidates pass, so the energy score often becomes the dominant ranking signal instead of a balanced one. In experiments like "Sad Pop Music," this made results feel directionally better on energy but sometimes less faithful to the user's explicit genre request.
-
-Prompts:  
-
-- Features it does not consider  
-- Genres or moods that are underrepresented  
-- Cases where the system overfits to one preference  
-- Ways the scoring might unintentionally favor some users  
-
----
-
-## 7. Evaluation  
-
-How you checked whether the recommender behaved as expected. 
-
-I tested the recommender with both everyday profiles (like High-Energy Pop, Chill Lofi, and Warm Up Workout) and adversarial profiles (like "Sad Pop Music," "High Energy + Sad," and "Impossible Preference"). I looked at the top 5 songs for each profile and checked whether the results felt musically reasonable for a real listener, not just mathematically high-scoring. One surprise was that songs like "Gym Hero" and "Sunrise City" kept appearing for users who asked for "Happy Pop," because those tracks score well on energy and danceability and get an extra boost from genre alignment. Another surprise was that contradictory profiles (for example, sad mood + very high energy) still produced stable recommendations, but the system sometimes prioritized energy fit over emotional tone. This evaluation helped me see that the outputs are often sensible, but they can still drift toward energetic tracks when user preferences conflict.
-
----
-
-## 8. Future Work  
-
-Ideas for how you would improve the model next.  
-
-Prompts:  
-
-- Additional features or preferences  
-- Better ways to explain recommendations  
-- Improving diversity among the top results  
-- Handling more complex user tastes  
-
----
-
-## 9. Personal Reflection  
-
-A few sentences about your experience.  
-
-Prompts:  
-
-- What you learned about recommender systems  
-- Something unexpected or interesting you discovered  
-- How this changed the way you think about music recommendation apps  
+If I extend this project, I would add a larger dataset, better diversity in the top 5, and adaptive weights based on user intent. I would also add clearer user controls so people can choose whether they want strict genre matching or mood-first matching.
