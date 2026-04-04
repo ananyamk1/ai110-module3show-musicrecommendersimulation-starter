@@ -17,66 +17,72 @@ Replace this paragraph with your own summary of what your version does.
 
 ## How The System Works
 
-Explain your design in plain language.
+This recommender is a content-based ranking system. It compares each song in `data/songs.csv` to a user taste profile, computes a weighted score, and returns the highest-ranked songs.
 
-Real-world recommenders (like Spotify and YouTube) usually combine many behavior signals and content signals: they score each item for how well it matches a user, then rank the full list to produce the final recommendations. My version is a simplified content-based system that prioritizes my vibe preferences: danceable beats, mellow texture, and songs that feel like they build toward a peak. Instead of treating "higher is always better," it rewards songs that are closest to my preferred feature targets.
+### Finalized Algorithm Recipe
 
-### Song Features Used
+1. Input data
+- Song features: `genre`, `mood`, `energy`, `tempo_bpm`, `valence`, `danceability`, `acousticness`
+- User profile: `preferred_genres`, `preferred_moods`, target numeric values, and feature weights
 
-- `id`
-- `title`
-- `artist`
-- `genre`
-- `mood`
-- `energy`
-- `tempo_bpm`
-- `valence`
-- `danceability`
-- `acousticness`
+2. Optional guardrail filter
+- Remove obvious mismatches before scoring, such as:
+   - danceability below the user's beat floor
+   - tempo outside the user's tolerance range
+   - energy far from the user's target
 
-### UserProfile Features Used
+3. Score numeric features by closeness
+- For each numeric feature, reward closeness to the target (not simply high or low values):
 
-- `preferred_genres` (list of liked genres)
-- `preferred_moods` (list of target moods such as chill/focused/moody)
-- `target_energy` (numeric target, matched by closeness)
-- `target_tempo_bpm` (numeric target, matched by closeness)
-- `target_valence` (numeric target, matched by closeness)
-- `target_danceability` (numeric target, matched by closeness)
-- `target_acousticness` (numeric target for mellow texture)
-- `weight_genre`
-- `weight_mood`
-- `weight_energy`
-- `weight_tempo`
-- `weight_valence`
-- `weight_danceability`
-- `weight_acousticness`
+$$
+	ext{closeness} = 1 - \min\left(\frac{|x - t|}{r}, 1\right)
+$$
 
-Some prompts to answer:
+- where $x$ is the song value, $t$ is the user target, and $r$ is the allowed range scale.
+- Apply this to `energy`, `tempo_bpm`, `valence`, `danceability`, and `acousticness`.
 
-- What features does each `Song` use in your system
-  - For example: genre, mood, energy, tempo
- I plan to use context of identity like artist, genre, mood, title then I will include energy, temp (BPM), danceability, acousticness, valence
+4. Score categorical matches
+- Genre score:
+   - 1.0 if song genre is in `preferred_genres`
+   - 0 otherwise
+- Mood score:
+   - 1.0 if song mood is in `preferred_moods`
+   - 0 otherwise
+- Mood can be weighted slightly higher than genre for vibe-focused matching.
 
+5. Add a "crescendo vibe" proxy
+- Because the dataset has no time-series audio progression, approximate buildup/peak feel as a weighted blend of:
+   - higher `danceability`
+   - moderate/high `energy`
+   - lower `acousticness`
+- This provides a boost for songs likely to feel like they build and release.
 
-- What information does your `UserProfile` store
-I will store preferred genres, moods, target numeric values for energy/temp/valence/danceability/acousticness and then feature weights to emphasize what matters more
+6. Weighted final score
 
-- How does your `Recommender` compute a score for each song
-I plan to do it like Spotify scores for songs in their platform partially- 
-Calculating closeness (like distance), like say song gets more score if energy or tempo is closer to my target values
-Could also add categorical match points for mood and genre, combine all with weighted sum
+$$
+S = w_g s_g + w_m s_m + w_e s_e + w_t s_t + w_v s_v + w_d s_d + w_a s_a + w_c s_c
+$$
 
-- How do you choose which songs to recommend
-First, optional guardrails filter out obvious mismatches (for example, too far from your danceability/tempo comfort zone). Then all remaining songs are scored with the same rule. Songs are ranked from highest to lowest total score. Top N songs are recommended as your final list (for example top 3 or top 5)
+- where:
+   - $s_g, s_m$ are genre and mood match scores
+   - $s_e, s_t, s_v, s_d, s_a$ are numeric closeness scores
+   - $s_c$ is the crescendo proxy
+   - weights are user-configurable and normalized
 
-You can include a simple diagram or bullet list if helpful.
+7. Ranking rule
+- Score every remaining song
+- Sort scores descending
+- Return Top $K$ recommendations (for example Top 3 or Top 5)
 
-User Profile (preferred genres, moods, target feature values, weights)
--> Compare each song to targets using closeness
--> Add mood/genre match points
--> Combine using weighted sum
--> Rank songs by final score
--> Return Top N recommendations
+8. Tie-break and variety
+- If scores tie, prefer:
+   - mood match first
+   - then closest tempo match
+   - then artist variety to avoid repeated artists in Top $K$
+
+### Potential Bias Note
+
+This system might over-prioritize the features with the largest weights (for example genre or mood), which can hide strong cross-genre songs that still match the user's overall vibe. It may also reflect the limited genre and mood coverage in the small CSV catalog.
 
 
 ---
@@ -118,11 +124,52 @@ You can add more tests in `tests/test_recommender.py`.
 
 ## Experiments You Tried
 
-Use this section to document the experiments you ran. For example:
+### Default Pop/Happy Profile
+Running the recommender with the default user profile (`genre: pop, mood: happy, energy: 0.8`) produces:
 
-- What happened when you changed the weight on genre from 2.0 to 0.5
-- What happened when you added tempo or valence to the score
-- How did your system behave for different types of users
+```
+Loaded songs: 18
+
+User Profile: genre=pop, mood=happy, energy=0.8
+================================================================================
+
+🎵 TOP 5 RECOMMENDATIONS (Score out of 10.0):
+
+1. SUNRISE CITY
+   Artist: Neon Echo
+   Score: 7.76/10.0
+   Why: genre match (+2.0), mood match (+1.0), energy alignment (+1.89), 
+        tempo match (+0.66), valence fit (+0.31), danceability fit (+1.11), 
+        acousticness fit (+0.36), crescendo vibe (+0.43)
+
+2. ROOFTOP LIGHTS
+   Artist: Indigo Parade
+   Score: 5.74/10.0
+   Why: mood match (+1.0), energy alignment (+1.77), tempo match (+0.48), 
+        valence fit (+0.40), danceability fit (+0.99), acousticness fit (+0.70), 
+        crescendo vibe (+0.41)
+
+3. GYM HERO
+   Artist: Max Pulse
+   Score: 5.31/10.0
+   Why: genre match (+2.0), energy alignment (+1.26), tempo match (+0.24), 
+        valence fit (+0.51), danceability fit (+0.73), acousticness fit (+0.10), 
+        crescendo vibe (+0.47)
+
+4. NEON SIDEWALK CIPHER
+   Artist: Nova Thread
+   Score: 5.01/10.0
+   Why: energy alignment (+1.31), tempo match (+1.08), valence fit (+0.49), 
+        danceability fit (+1.33), acousticness fit (+0.42), crescendo vibe (+0.39)
+
+5. PULSE OF LAGOS
+   Artist: Kemi Ray
+   Score: 4.57/10.0
+   Why: energy alignment (+1.66), tempo match (+1.08), valence fit (+0.37), 
+        danceability fit (+0.64), acousticness fit (+0.36), crescendo vibe (+0.46)
+```
+
+**Analysis**: The top recommendation (Sunrise City) earns the highest score because it matches on **all three primary criteria**: genre (pop), mood (happy), AND energy alignment (0.82 ≈ 0.8 target). The second-place song (Rooftop Lights) matches mood and energy well but is indie pop (not the exact genre match), illustrating how the scoring balances categorical matches with numeric closeness. GYM HERO has high energy but "intense" mood, showing how mood preference creates a trade-off.
 
 ---
 
