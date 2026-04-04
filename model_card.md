@@ -63,6 +63,8 @@ Prompts:
 
 Where the system struggles or behaves unfairly. 
 
+One weakness I observed is an energy-driven filter bubble: because energy alignment is weighted strongly, songs with similar energy repeatedly rise to the top even when mood or genre intent is less aligned. This can bias recommendations toward users whose preferences are near the dataset's mid-to-high energy range, while users asking for low-energy but emotionally specific music may get less precise results. The default guardrails are broad enough to let many candidates pass, so the energy score often becomes the dominant ranking signal instead of a balanced one. In experiments like "Sad Pop Music," this made results feel directionally better on energy but sometimes less faithful to the user's explicit genre request.
+
 Prompts:  
 
 - Features it does not consider  
@@ -76,14 +78,7 @@ Prompts:
 
 How you checked whether the recommender behaved as expected. 
 
-Prompts:  
-
-- Which user profiles you tested  
-- What you looked for in the recommendations  
-- What surprised you  
-- Any simple tests or comparisons you ran  
-
-No need for numeric metrics unless you created some.
+I tested the recommender with both everyday profiles (like High-Energy Pop, Chill Lofi, and Warm Up Workout) and adversarial profiles (like "Sad Pop Music," "High Energy + Sad," and "Impossible Preference"). I looked at the top 5 songs for each profile and checked whether the results felt musically reasonable for a real listener, not just mathematically high-scoring. One surprise was that songs like "Gym Hero" and "Sunrise City" kept appearing for users who asked for "Happy Pop," because those tracks score well on energy and danceability and get an extra boost from genre alignment. Another surprise was that contradictory profiles (for example, sad mood + very high energy) still produced stable recommendations, but the system sometimes prioritized energy fit over emotional tone. This evaluation helped me see that the outputs are often sensible, but they can still drift toward energetic tracks when user preferences conflict.
 
 ---
 
