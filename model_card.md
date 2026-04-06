@@ -2,7 +2,7 @@
 
 ## 1. Model Name  
 
-Give your model a short, descriptive name.  
+  
 Example: **VibeFinder 1.0**  
 
 I named my model VibeCompass 1.0. I chose that name because my recommender tries to guide a listener toward songs that match their current taste direction, not just their genre label. The name also fits the way I built the project: I kept adjusting the scoring logic until it pointed more reliably toward the kind of music I wanted it to surface.
@@ -137,6 +137,23 @@ Prompts:
 If I keep developing this model, I would first expand the dataset so the recommender has more variety to learn from. I would add more songs across underrepresented genres and moods, because the current catalog is still too small to support broad recommendations. I would also keep improving the diversity penalty so the final top-k results are less repetitive when the same artist or genre keeps appearing.
 
 I would also like to improve the explanation system. Right now, the reason strings are helpful, but I think I could make the output even clearer by summarizing which features mattered most for the final rank. Another future improvement would be to make the ranking mode more user-configurable, so someone could choose strict genre matching, mood-first matching, or an exploratory mode depending on what kind of recommendation session they want.
+
+## Challenge Implementation Summary
+
+### Challenge 1: Add Advanced Song Features with Agent Mode
+I implemented this challenge by expanding `data/songs.csv` and updating parsing plus scoring logic in `src/recommender.py`. I added at least five advanced attributes: popularity (0-100), release decade, mood tags, lyrical density, and production quality. I then introduced math-based scoring rules for each one, including closeness scoring for numeric fields and overlap scoring for mood tags. This made the ranking less dependent on only genre and mood and allowed era, detail, and style signals to influence outcomes in a measurable way.
+
+### Challenge 2: Create Multiple Scoring Modes
+I implemented multiple ranking strategies in `src/recommender.py` using a simple strategy-style structure so modes stay modular and easy to extend. The modes I added were balanced, genre_first, mood_first, and energy_focused. I exposed mode switching in `src/main.py`, which allowed me to compare how the same profile produces different results depending on recommendation philosophy. This made experimentation and debugging much more structured than a single fixed scorer.
+
+### Challenge 3: Diversity and Fairness Logic
+I implemented a diversity penalty during top-k selection so repeated artists and genres are less likely to dominate the final list. The reranking step computes an adjusted score by subtracting repeat penalties when an artist or genre already appears in selected recommendations. In plain terms, the rule follows adjusted_score = base_score - artist_repeat_penalty - genre_repeat_penalty. This gave me better list variety while preserving relevance.
+
+### Challenge 4: Visual Summary Table
+I improved terminal readability by adding an ASCII summary table in `src/main.py` that shows title, artist, score, and reason text. I also wrapped long reason strings so explanations remain readable rather than collapsing into one long line. This made the recommender much easier to validate because I could inspect scores and explanations in one clean view.
+
+### Challenge 5: System Evaluation and Stress Testing
+I implemented an explicit evaluation pass with normal, adversarial, and contradictory user profiles to test robustness. I used scenarios like Sad Pop Music, High Energy + Sad, and Impossible Preference to verify the model still returns the nearest compromise rather than failing. I also validated behavior with `pytest -q` and repeated CLI runs to confirm that feature additions, strategy modes, and diversity reranking continued to work together correctly.
 
 ---
 
