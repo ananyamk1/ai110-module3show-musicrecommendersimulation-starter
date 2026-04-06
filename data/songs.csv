@@ -1,19 +1,19 @@
-id,title,artist,genre,mood,energy,tempo_bpm,valence,danceability,acousticness
-1,Sunrise City,Neon Echo,pop,happy,0.82,118,0.84,0.79,0.18
-2,Midnight Coding,LoRoom,lofi,chill,0.42,78,0.56,0.62,0.71
-3,Storm Runner,Voltline,rock,intense,0.91,152,0.48,0.66,0.10
-4,Library Rain,Paper Lanterns,lofi,chill,0.35,72,0.60,0.58,0.86
-5,Gym Hero,Max Pulse,pop,intense,0.93,132,0.77,0.88,0.05
-6,Spacewalk Thoughts,Orbit Bloom,ambient,chill,0.28,60,0.65,0.41,0.92
-7,Coffee Shop Stories,Slow Stereo,jazz,relaxed,0.37,90,0.71,0.54,0.89
-8,Night Drive Loop,Neon Echo,synthwave,moody,0.75,110,0.49,0.73,0.22
-9,Focus Flow,LoRoom,lofi,focused,0.40,80,0.59,0.60,0.78
-10,Rooftop Lights,Indigo Parade,indie pop,happy,0.76,124,0.81,0.82,0.35
-11,Neon Sidewalk Cipher,Nova Thread,hip-hop,gritty,0.68,96,0.42,0.74,0.21
-12,Velvet Letters,Marina Vale,r&b,romantic,0.52,84,0.73,0.67,0.46
-13,Sundown Dust Trail,Cedar Lane,country,nostalgic,0.44,88,0.66,0.55,0.72
-14,Pulse of Lagos,Kemi Ray,afrobeats,uplifting,0.86,104,0.82,0.90,0.18
-15,Cathedral Drift,Orion Quartet,classical,cinematic,0.31,68,0.58,0.28,0.95
-16,Midnight Avenida,Rio Noche,reggaeton,playful,0.88,98,0.79,0.93,0.09
-17,Warehouse Sunrise,Glass Harbor,house,euphoric,0.92,126,0.76,0.91,0.07
-18,Blue Hour Static,Ash Monroe,blues,melancholic,0.39,76,0.33,0.47,0.81
+id,title,artist,genre,mood,energy,tempo_bpm,valence,danceability,acousticness,popularity,release_decade,mood_tags,lyrical_density,production_quality
+1,Sunrise City,Neon Echo,pop,happy,0.82,118,0.84,0.79,0.18,86,2020,uplifting|anthemic|bright,0.68,8.6
+2,Midnight Coding,LoRoom,lofi,chill,0.42,78,0.56,0.62,0.71,62,2020,calm|study|soft,0.26,8.1
+3,Storm Runner,Voltline,rock,intense,0.91,152,0.48,0.66,0.10,73,2010,aggressive|driving|epic,0.59,7.9
+4,Library Rain,Paper Lanterns,lofi,chill,0.35,72,0.60,0.58,0.86,58,2010,nostalgic|rainy|soft,0.21,7.7
+5,Gym Hero,Max Pulse,pop,intense,0.93,132,0.77,0.88,0.05,91,2020,workout|confident|aggressive,0.55,8.3
+6,Spacewalk Thoughts,Orbit Bloom,ambient,chill,0.28,60,0.65,0.41,0.92,49,2000,ethereal|calm|floating,0.12,7.4
+7,Coffee Shop Stories,Slow Stereo,jazz,relaxed,0.37,90,0.71,0.54,0.89,57,1990,warm|nostalgic|acoustic,0.47,7.5
+8,Night Drive Loop,Neon Echo,synthwave,moody,0.75,110,0.49,0.73,0.22,78,1980,neon|retro|moody,0.43,8.8
+9,Focus Flow,LoRoom,lofi,focused,0.40,80,0.59,0.60,0.78,66,2020,study|steady|minimal,0.23,8.2
+10,Rooftop Lights,Indigo Parade,indie pop,happy,0.76,124,0.81,0.82,0.35,74,2010,uplifting|youthful|bright,0.61,8.0
+11,Neon Sidewalk Cipher,Nova Thread,hip-hop,gritty,0.68,96,0.42,0.74,0.21,72,2010,gritty|urban|confident,0.84,7.8
+12,Velvet Letters,Marina Vale,r&b,romantic,0.52,84,0.73,0.67,0.46,69,2000,sensual|smooth|night,0.79,8.4
+13,Sundown Dust Trail,Cedar Lane,country,nostalgic,0.44,88,0.66,0.55,0.72,54,1990,warm|storytelling|nostalgic,0.71,7.2
+14,Pulse of Lagos,Kemi Ray,afrobeats,uplifting,0.86,104,0.82,0.90,0.18,83,2020,dancefloor|sunny|uplifting,0.52,8.7
+15,Cathedral Drift,Orion Quartet,classical,cinematic,0.31,68,0.58,0.28,0.95,52,1970,orchestral|dramatic|cinematic,0.06,8.9
+16,Midnight Avenida,Rio Noche,reggaeton,playful,0.88,98,0.79,0.93,0.09,88,2020,party|playful|dancefloor,0.49,8.5
+17,Warehouse Sunrise,Glass Harbor,house,euphoric,0.92,126,0.76,0.91,0.07,87,2010,euphoric|club|driving,0.35,8.6
+18,Blue Hour Static,Ash Monroe,blues,melancholic,0.39,76,0.33,0.47,0.81,51,1980,sad|smoky|reflective,0.67,7.3
