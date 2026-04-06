@@ -1,52 +1,97 @@
 # 🎵 Music Recommender Simulation
 
 ## Project Summary
-This project builds a small music recommender and explains how it works.
-The system compares song features with a user profile and ranks songs by score.
-I extended the starter version with advanced features, switchable ranking strategies, and diversity logic.
-The goal is classroom learning, not production-grade personalization.
+In this project, I built a music recommender that ranks songs based on how well they match a user taste profile. I started with the baseline logic, then iteratively expanded both the data model and scoring design to make recommendations more explainable and testable.
+
+My final version does four major things beyond the starter:
+- I expanded the song dataset with advanced attributes.
+- I implemented richer scoring rules that include both categorical matching and numeric closeness.
+- I added switchable ranking modes (strategy-style behavior).
+- I added diversity/fairness reranking so top results are less repetitive.
+
+I used AI assistance to accelerate brainstorming and refactoring, but I validated each major change by running the app and tests in terminal.
 
 ---
 
 ## How The System Works
-This recommender is a content-based ranking system.
-It scores each song against a user profile and returns the highest-ranked results.
+My recommender is a content-based ranking system. I compare each song in the catalog against a user profile, calculate a score with interpretable reasons, and then rank songs by score.
 
-### Song Features Used
-- Base features: genre, mood, energy, tempo_bpm, valence, danceability, acousticness
-- Advanced features: popularity, release_decade, mood_tags, lyrical_density, production_quality
+### What Features I Use Per Song
+I use the starter features plus advanced features I added:
+- Base: genre, mood, energy, tempo_bpm, valence, danceability, acousticness
+- Advanced: popularity, release_decade, mood_tags, lyrical_density, production_quality
 
-### User Preferences Used
-- Base preferences: preferred genre, preferred mood, target energy
-- Optional targets: tempo, valence, danceability, acousticness
-- Advanced targets: target popularity, preferred decade, preferred mood tags, target lyrical density, target production quality
-- Ranking mode: balanced, genre_first, mood_first, energy_focused
-- Diversity controls: artist diversity penalty and optional genre diversity penalty
+### What My User Profile Stores
+My user profile (dictionary style in CLI mode) can include:
+- Core taste: genre, mood, energy
+- Optional numeric targets: tempo_bpm, valence, danceability, acousticness
+- Advanced targets: target_popularity, preferred_decade, preferred_mood_tags, target_lyrical_density, target_production_quality
+- Behavior controls: ranking mode and diversity penalty settings
 
-### Scoring Overview
-1. Score categorical matches (genre and mood).
-2. Score numeric closeness for energy, tempo, valence, danceability, and acousticness.
-3. Add advanced feature scores:
+### How I Compute Scores
+I designed scoring as layered logic:
+1. I award points for categorical alignment (genre and mood matches).
+2. I award closeness points for numeric features using a bounded distance function.
+3. I add advanced-feature points:
    - popularity closeness
    - decade preference (exact/adjacent)
-   - mood tag overlap
-   - lyrical density closeness
-   - production quality closeness
-4. Apply mode-specific strategy bonus.
-5. Build top-k results with diversity penalties to reduce repeated artists/genres.
+   - mood-tag overlap
+   - lyrical-density closeness
+   - production-quality closeness
+4. I apply a mode-specific strategy bonus.
+5. I rerank top candidates with diversity penalties to reduce repeated artists and repeated genres.
 
-### Strategy Modes
-- `balanced`: no extra directional bonus
-- `genre_first`: boosts songs in preferred genre
-- `mood_first`: boosts songs in preferred mood
-- `energy_focused`: boosts energy closeness more strongly
+### Why I Added Explanations
+Every recommendation carries reasons (for example, genre match, energy alignment, mood-tag match). I did this so I can debug the model and explain outcomes to a non-technical user.
 
-### Diversity Rule
-When a song is considered for top-k selection, its adjusted score is:
+### Final Algorithm Recipe (Plain English)
+- Loop through all songs.
+- Skip songs that violate guardrails.
+- Score each song with base + advanced + strategy components.
+- Sort by score.
+- Build top-k list with diversity penalties applied during selection.
+- Return top songs with score and reason text.
+
+### Strategy Modes I Implemented
+- balanced: no extra directional bias
+- genre_first: extra bonus for preferred genre
+- mood_first: extra bonus for preferred mood
+- energy_focused: extra bonus for energy closeness
+
+### Diversity Rule I Implemented
+When selecting top results, I reduce a candidate's adjusted score if its artist or genre already appears in previously selected songs.
+
+Adjusted score rule:
 
 adjusted_score = base_score - (artist_repeat_count × artist_penalty) - (genre_repeat_count × genre_penalty)
 
-This makes repeated artists (and optionally repeated genres) less likely to dominate the final list.
+This helps me prevent one artist from dominating the top recommendations.
+
+### Mermaid Flowchart
+```mermaid
+flowchart TD
+    A[User Preferences] --> B[Load Songs from CSV]
+    B --> C[Loop Through Songs]
+    C --> D[Guardrail Check]
+    D -->|Pass| E[Base Scoring]
+    D -->|Fail| C
+
+    E --> F[Categorical Scoring<br/>genre + mood]
+    E --> G[Numeric Closeness<br/>energy tempo valence danceability acousticness]
+    E --> H[Advanced Features<br/>popularity decade mood tags lyrical density quality]
+
+    F --> I[Base Total Score]
+    G --> I
+    H --> I
+
+    I --> J[Apply Strategy Mode<br/>balanced / genre_first / mood_first / energy_focused]
+    J --> K[Sort Candidates by Score]
+    K --> L[Top-K Diversity Rerank<br/>artist and genre penalties]
+    L --> M[Final Recommendations + Reasons]
+```
+
+### Potential Bias Note
+I expected that whichever feature got the highest weight would dominate outcomes, and that happened in practice. In my experiments, energy-heavy logic often pulled energetic tracks upward across very different profiles. This means my system can over-prioritize energetic songs even when mood or genre intent suggests a calmer result.
 
 ---
 
@@ -78,39 +123,64 @@ python -m src.main
 pytest -q
 ```
 
+I also added a tests bootstrap file so plain pytest works without extra environment variables.
+
 ---
 
 ## Experiments You Tried
-I tested multiple profile types and compared ranking behavior:
+I treated this like an iterative engineering process, not a one-shot coding task.
 
-- Everyday profiles: High-Energy Pop, Chill Lofi, Warm Up Workout
-- Edge-case profiles: Sad Pop Music, High Energy + Sad, Impossible Preference
-- Strategy comparison: balanced vs genre_first vs mood_first vs energy_focused
-- Logic experiment: shifted weight emphasis from genre-heavy toward energy-heavy
+### Experiment Set 1: Baseline Profile Behavior
+I began with a default profile (pop, happy, energy around 0.8). I checked whether top songs looked intuitively correct and whether reason strings matched the actual score components. This gave me a baseline for later comparisons.
 
-### What Happened
-- Strategy modes produced clearly different top-3 results.
-- Energy-focused ranking consistently promoted high-energy songs.
-- Mood-first ranking improved emotional alignment in several cases.
-- Diversity penalties reduced repeated-artist dominance in top recommendations.
+### Experiment Set 2: Diverse User Profiles
+I ran multiple profile styles to validate separation:
+- High-Energy Pop
+- Chill Lofi
+- Deep Intense Rock
+- Warm Up Workout
+
+I looked for whether outputs shifted in expected ways (for example, high-energy users receiving faster and more danceable tracks).
+
+### Experiment Set 3: Adversarial and Edge Cases
+I built a dedicated evaluation script to stress the scorer with contradictory inputs:
+- High Energy + Sad
+- Sad Pop Music
+- Impossible Preference
+- Non-Danceable House
+- 200 BPM Acoustic Jazz
+
+This helped me identify where my score components conflict and where the model chooses compromise songs.
+
+### Experiment Set 4: Logic Sensitivity
+I tested sensitivity by changing weight emphasis (genre vs energy) and observed ranking shifts. The key result was that small scoring changes can significantly change top results.
+
+### Experiment Set 5: Strategy Mode Comparison
+I implemented mode switching and compared top-3 outputs per mode in terminal:
+- balanced
+- genre_first
+- mood_first
+- energy_focused
+
+This confirmed my modular design was doing real work, not just cosmetic branching.
+
+### Experiment Set 6: Diversity and Fairness Reranking
+I added artist and genre penalties in top-k selection to reduce repeated artists/genres. I then checked whether diversity improved without making results nonsensical.
 
 ---
 
 ## Limitations and Risks
-- The dataset is small (18 songs), so repetition is unavoidable.
-- Some genres and moods are underrepresented.
-- The system does not use lyrics, language, or cultural context.
-- Strong weights can create filter-bubble behavior (for example, energy-heavy outputs).
-- Scores can look confident even when user preferences are contradictory.
+- My dataset is very small, so coverage is limited and repetition is unavoidable.
+- Some genres and moods have very few examples, so ranking can be unstable for niche profiles.
+- I still do not model lyrical semantics, language, artist history, or user session context.
+- The model can look confident in contradictory preference situations even when no true match exists.
+- Feature weighting can create filter bubbles if one signal (like energy) becomes too dominant.
+
+I discuss these limitations more formally in the model card.
 
 ---
 
 ## Reflection
-My biggest learning was that simple scoring choices can strongly change outputs.
-A small weight or strategy change can move a song from rank 1 to rank 3.
-That made it clear that recommender behavior is not only about data, but also about design decisions.
+My biggest learning was that recommendation quality is not only about adding more features; it is about designing trade-offs carefully. I saw that tiny logic changes can move a song from first place to third place, which taught me how sensitive ranking systems are to scoring assumptions.
 
-Using AI tools helped me move faster when brainstorming profiles, writing comparison logic, and debugging quickly.
-I still had to verify every important suggestion by running tests and checking real terminal output.
-I was surprised that even a simple point-based system can feel like a real recommender when results mostly match user intent.
-If I extend this project, I would add a larger catalog, better calibration of scores, and stronger diversity controls.
+AI tools helped me prototype faster, especially for brainstorming edge cases, strategy structures, and documentation drafts. But I had to verify everything by running tests, checking terminal output, and reading score reasons line by line. What surprised me most is that even simple point-based logic can feel "smart" when outputs align with user intent. If I continue this project, I will focus on better data coverage, stronger fairness controls, and user-configurable recommendation goals (strict genre mode vs mood-first mode).
