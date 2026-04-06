@@ -1,56 +1,52 @@
-# Model Card: VibeCompass 1.0
+# 🎧 Model Card - Music Recommender Simulation
 
-## Model Name
+## 1. Model Name
 VibeCompass 1.0.
-It recommends songs based on vibe and listening goals.
 
-## Goal / Task
-This recommender suggests songs a user might like.
-It tries to match genre, mood, and music features like energy and tempo.
-It returns the top ranked songs, not one perfect answer.
+## 2. Intended Use
+This model suggests 3 to 5 songs from a small catalog.
+It is designed for classroom exploration of recommender logic.
+It is useful for testing how profile choices and scoring rules affect ranking.
+It is not designed for real-user personalization at scale.
 
-## Data Used
-The dataset has 18 songs.
-Each song includes genre, mood, energy, tempo, valence, danceability, and acousticness.
-The catalog is small, so it cannot represent all music tastes.
-Some genres and moods have only one or two songs.
+## 3. How It Works (Short Explanation)
+The model compares each song to a user profile.
+It gives points for genre and mood matches.
+It gives more points when numeric features are close to user targets.
+It also scores advanced attributes like popularity, decade preference, mood tags, lyrical density, and production quality.
+After scoring, it applies a selected strategy mode and then reranks with diversity penalties.
 
-## Algorithm Summary
-Each song gets points for how well it matches user preferences.
-Genre and mood can add bonus points.
-Feature similarity adds more points when values are close to the user target.
-Right now, energy has strong influence, so energetic songs can rank high often.
-Then the system sorts songs by score and returns the top results.
+## 4. Data
+The dataset has 18 songs in data/songs.csv.
+Each row includes genre, mood, energy, tempo, valence, danceability, and acousticness.
+I added advanced fields: popularity, release_decade, mood_tags, lyrical_density, and production_quality.
+The catalog is still small, so many tastes are underrepresented.
 
-## Observed Behavior / Biases
-I saw an energy-centered pattern in many tests.
-Songs with similar energy often beat songs with better emotional fit.
-For example, songs like "Gym Hero" can appear often for "Happy Pop" style users because they are high energy and highly danceable.
-The small dataset also creates repetition, so the same songs show up across different profiles.
+## 5. Strengths
+The model is easy to understand and debug.
+Different user profiles produce visibly different outputs.
+Strategy modes make behavior explainable (genre-first, mood-first, energy-focused).
+The diversity penalty helps reduce repeated artists in top results.
 
-## Evaluation Process
-I tested everyday profiles like High-Energy Pop, Chill Lofi, and Warm Up Workout.
-I also tested edge-case profiles like Sad Pop Music, High Energy + Sad, and Impossible Preference.
-I compared top 5 outputs across profiles to see what changed and why.
-I also ran a logic experiment by lowering genre weight and increasing energy weight.
-That experiment showed clearer emotional matches in some cases, but weaker genre loyalty in others.
+## 6. Limitations and Bias
+The small dataset creates repetition and limited coverage.
+High-weight features can dominate and create filter-bubble behavior.
+For example, energy-focused scoring can over-promote energetic songs across different users.
+The model also lacks lyrical meaning, language, and cultural context.
 
-## Intended Use and Non-Intended Use
-Intended use: classroom learning and basic recommender experiments.
-It is good for understanding how weights and features affect ranking.
-Non-intended use: real-world music personalization at scale.
-It should not be used for high-stakes decisions or claims about user identity, mental health, or culture.
+## 7. Evaluation
+I tested everyday profiles and edge-case profiles.
+Examples include High-Energy Pop, Chill Lofi, Sad Pop Music, High Energy + Sad, and Impossible Preference.
+I compared top results across strategy modes and checked whether changes made musical sense.
+I also ran unit tests and adversarial evaluation scripts to confirm the system runs correctly.
 
-## Ideas for Improvement
-1. Increase dataset size and balance genres and moods.
-2. Add a small penalty for strong mood mismatch so happy songs do not dominate sad requests.
-3. Add a diversity rule so top 5 results are less repetitive.
+## 8. Future Work
+1. Expand the dataset with more songs, genres, and moods.
+2. Improve diversity controls so top-k results are less repetitive.
+3. Add user-facing controls for strict genre mode versus mood-first mode.
 
-## Personal Reflection
-My biggest learning moment was seeing how one weight change could totally change the top recommendation. I learned that recommender behavior is not just about data, it is also about design choices in scoring.
-
-AI tools helped me move faster when generating test profiles, comparing outputs, and writing clear explanations. I still had to double-check AI suggestions by running the code and reading the actual ranking results in the terminal.
-
-I was surprised that a simple point-based algorithm could still feel like a real recommendation system. Even basic rules made results that felt intuitive most of the time, which is both useful and a little risky when hidden biases are present.
-
-If I extend this project, I would add a larger dataset, better diversity in the top 5, and adaptive weights based on user intent. I would also add clearer user controls so people can choose whether they want strict genre matching or mood-first matching.
+## 9. Personal Reflection
+My biggest learning was that a small scoring change can strongly shift recommendations.
+AI tools helped me move faster in brainstorming and implementation, but I still had to verify outputs with tests and terminal runs.
+I was surprised that a simple scoring system can feel realistic when profile intent and ranking align.
+If I continue this project, I would focus on richer data, better fairness checks, and clearer score explanations for users.
