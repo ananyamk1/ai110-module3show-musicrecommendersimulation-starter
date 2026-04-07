@@ -50,6 +50,20 @@ I expect the biggest bias risk to come from whichever feature gets the strongest
 
 ---
 
+<img width="1514" height="974" alt="image" src="https://github.com/user-attachments/assets/d6b39088-a4ca-4ec4-9632-893835c55db0" />
+
+
+
+<img width="1910" height="1228" alt="image" src="https://github.com/user-attachments/assets/8e96c87e-4d86-4f0a-bb2c-93aae292794b" />
+
+
+
+
+<img width="1972" height="968" alt="image" src="https://github.com/user-attachments/assets/b8ce574c-5476-4614-b0e4-63186eea95df" />
+
+
+---
+
 ## Getting Started
 
 ### Setup
